@@ -43,7 +43,9 @@ jobs:
 
       - name: Fix missing launcher icon resource
         working-directory: project
-        run: sed -i 's|@mipmap/ic_launcher|@android:drawable/sym_def_app_icon|g' android/app/src/main/AndroidManifest.xml
+        run: |
+          sed -i 's|@mipmap/ic_launcher|@android:drawable/sym_def_app_icon|g' android/app/src/main/AndroidManifest.xml
+          sed -i 's|android:screenOrientation="sensorLandscape"|android:screenOrientation="portrait"|' android/app/src/main/AndroidManifest.xml
 
       - name: Build signed Android APK
         working-directory: project
