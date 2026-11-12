@@ -1,0 +1,47 @@
+name: Build Shadow Dynasty APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Shadow-Dynasty-GitHub-Package.zip'
+      - '.github/workflows/build-shadow-dynasty.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract uploaded game package
+        run: |
+          mkdir -p /tmp/shadow-dynasty
+          unzip -q "Shadow-Dynasty-GitHub-Package.zip" -d /tmp/shadow-dynasty
+          test -f /tmp/shadow-dynasty/shadow-dynasty-app/app/src/main/assets/index.html
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build Android APK
+        working-directory: /tmp/shadow-dynasty/shadow-dynasty-app
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shadow-Dynasty-APK
+          path: /tmp/shadow-dynasty/shadow-dynasty-app/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
